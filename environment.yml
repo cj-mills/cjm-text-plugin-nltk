@@ -1,0 +1,25 @@
+name: cjm-text-plugin-nltk
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+    # Core Infrastructure
+    - cjm-plugin-system
+
+    # Tier 2 Interface
+    - cjm-text-plugin-system
+
+    # Utilities
+    - fastcore
+    - pydantic
+
+    # NLP
+    - nltk
+
+    # Worker dependencies
+    - fastapi
+    - uvicorn
+    - psutil
+    - httpx
