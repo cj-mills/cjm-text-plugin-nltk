@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "cjm-text-plugin-nltk"
+  site-url: "https://cj-mills.github.io/cjm-text-plugin-nltk"
+  description: "A local, NLTK-based text processing worker for the cjm-plugin-system that provides sentence splitting and tokenization with character-level span tracking."
+  repo-branch: main
+  repo-url: "https://github.com/cj-mills/cjm-text-plugin-nltk"
