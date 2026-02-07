@@ -28,6 +28,8 @@ def get_plugin_metadata() -> Dict[str, Any]:  # Plugin metadata for manifest gen
     else:
         data_dir = os.path.join(base_path, "data")
     
+    db_path = os.path.join(data_dir, "nltk_text_processing.db")
+    
     # Ensure data directory exists
     os.makedirs(data_dir, exist_ok=True)
     
@@ -47,6 +49,8 @@ def get_plugin_metadata() -> Dict[str, Any]:  # Plugin metadata for manifest gen
         
         # Critical: The absolute path to THIS environment's python
         "python_path": sys.executable,
+        
+        "db_path": db_path,
         
         # NLTK is lightweight - no GPU required
         "resources": {

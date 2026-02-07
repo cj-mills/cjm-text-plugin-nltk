@@ -8,6 +8,7 @@ __all__ = ['NLTKPluginConfig', 'NLTKPlugin']
 # %% ../nbs/plugin.ipynb #1899201c
 import logging
 import os
+from uuid import uuid4
 from dataclasses import dataclass, field
 from typing import Dict, Any, Optional, List
 
@@ -16,10 +17,13 @@ from nltk.tokenize import PunktSentenceTokenizer
 
 from cjm_text_plugin_system.plugin_interface import TextProcessingPlugin
 from cjm_text_plugin_system.core import TextProcessResult, TextSpan
+from cjm_text_plugin_system.storage import TextProcessStorage
+from cjm_plugin_system.utils.hashing import hash_bytes
 from cjm_plugin_system.utils.validation import (
     dict_to_config, config_to_dict, dataclass_to_jsonschema,
     SCHEMA_TITLE, SCHEMA_DESC, SCHEMA_ENUM
 )
+from .meta import get_plugin_metadata
 
 # %% ../nbs/plugin.ipynb #687955b4
 @dataclass
@@ -54,6 +58,7 @@ class NLTKPlugin(TextProcessingPlugin):
         self.config: NLTKPluginConfig = None
         self._tokenizer: PunktSentenceTokenizer = None
         self._nltk_data_dir: Optional[str] = None
+        self.storage: Optional[TextProcessStorage] = None
     
     @property
     def name(self) -> str:  # Plugin name identifier
@@ -141,6 +146,10 @@ class NLTKPlugin(TextProcessingPlugin):
         # Ensure NLTK data is available
         self._ensure_nltk_data()
         
+        # Initialize standardized storage
+        db_path = get_plugin_metadata()["db_path"]
+        self.storage = TextProcessStorage(db_path)
+        
         self.logger.info(f"Initialized NLTK plugin with language '{self.config.language}'")
     
     def _get_tokenizer(self) -> PunktSentenceTokenizer:
@@ -157,11 +166,28 @@ class NLTKPlugin(TextProcessingPlugin):
         """Execute a text processing operation."""
         if action == "split_sentences":
             text = kwargs.pop("text", "")
+            job_id = kwargs.pop("job_id", str(uuid4()))
             result = self.split_sentences(text, **kwargs)
             
             # Serialize for IPC
+            spans_data = [s.to_dict() for s in result.spans]
+            
+            # Save to standardized storage
+            input_hash = hash_bytes(text.encode())
+            try:
+                self.storage.save(
+                    job_id=job_id,
+                    input_text=text,
+                    input_hash=input_hash,
+                    spans=spans_data,
+                    metadata=result.metadata
+                )
+                self.logger.info(f"Saved result to DB (Job: {job_id})")
+            except Exception as e:
+                self.logger.error(f"Failed to save to DB: {e}")
+            
             return {
-                "spans": [s.to_dict() for s in result.spans],
+                "spans": spans_data,
                 "metadata": result.metadata
             }
         else:
