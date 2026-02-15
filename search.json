@@ -1,0 +1,102 @@
+[
+  {
+    "objectID": "plugin.html",
+    "href": "plugin.html",
+    "title": "NLTK Plugin",
+    "section": "",
+    "text": "source",
+    "crumbs": [
+      "NLTK Plugin"
+    ]
+  },
+  {
+    "objectID": "plugin.html#testing-the-plugin",
+    "href": "plugin.html#testing-the-plugin",
+    "title": "NLTK Plugin",
+    "section": "Testing the Plugin",
+    "text": "Testing the Plugin\n\n# Test basic functionality\nplugin = NLTKPlugin()\n\nprint(f\"Plugin name: {plugin.name}\")\nprint(f\"Plugin version: {plugin.version}\")\nprint(f\"Config class: {plugin.config_class.__name__}\")\n\n# Test configuration dataclass\nfrom dataclasses import fields\n\nprint(\"Available languages:\")\nlang_field = next(f for f in fields(NLTKPluginConfig) if f.name == \"language\")\nfor lang in lang_field.metadata.get(SCHEMA_ENUM, []):\n    print(f\"  - {lang}\")\n\n# Test initialization\nplugin.initialize({\"language\": \"english\"})\n\ncurrent_config = plugin.get_current_config()\nprint(f\"Current config: {current_config}\")\n\n# Test get_config_schema for UI generation\nimport json\n\nschema = plugin.get_config_schema()\nprint(\"JSON Schema for NLTKPluginConfig:\")\nprint(json.dumps(schema, indent=2))\n\nPlugin name: nltk_text\nPlugin version: 1.0.0\nConfig class: NLTKPluginConfig\nAvailable languages:\n  - english\n  - german\n  - french\n  - spanish\n  - italian\n  - portuguese\n  - dutch\nCurrent config: {'tokenizer': 'punkt', 'language': 'english'}\nJSON Schema for NLTKPluginConfig:\n{\n  \"name\": \"NLTKPluginConfig\",\n  \"title\": \"NLTKPluginConfig\",\n  \"description\": \"Configuration for NLTK text processing plugin.\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"tokenizer\": {\n      \"type\": \"string\",\n      \"title\": \"Tokenizer\",\n      \"description\": \"NLTK tokenizer to use for sentence splitting\",\n      \"enum\": [\n        \"punkt\"\n      ],\n      \"default\": \"punkt\"\n    },\n    \"language\": {\n      \"type\": \"string\",\n      \"title\": \"Language\",\n      \"description\": \"Language for tokenization (affects sentence boundary detection)\",\n      \"enum\": [\n        \"english\",\n        \"german\",\n        \"french\",\n        \"spanish\",\n        \"italian\",\n        \"portuguese\",\n        \"dutch\"\n      ],\n      \"default\": \"english\"\n    }\n  }\n}\n\n\n\n# Test split_sentences directly\ntext = \"Hello world. How are you? I am fine! This is a test.\"\nresult = plugin.split_sentences(text)\n\nprint(f\"Input: '{text}'\")\nprint(f\"Spans found: {len(result.spans)}\")\nprint(f\"Metadata: {result.metadata}\")\n\nfor i, span in enumerate(result.spans):\n    print(f\"  {i}: '{span.text}' [{span.start_char}:{span.end_char}]\")\n    # Verify mapping back to original\n    assert text[span.start_char:span.end_char] == span.text, f\"Mismatch at span {i}\"\n\nInput: 'Hello world. How are you? I am fine! This is a test.'\nSpans found: 4\nMetadata: {'processor': 'nltk_text', 'tokenizer': 'punkt', 'language': 'english', 'nltk_data_dir': None}\n  0: 'Hello world.' [0:12]\n  1: 'How are you?' [13:25]\n  2: 'I am fine!' [26:36]\n  3: 'This is a test.' [37:52]\n\n\n\n# Test execute() dispatcher (as Worker would call it)\njson_result = plugin.execute(action=\"split_sentences\", text=text)\n\nprint(f\"JSON result from execute():\")\nprint(f\"  spans: {len(json_result['spans'])} items\")\nprint(f\"  metadata: {json_result['metadata']}\")\n\nfor span_dict in json_result['spans']:\n    print(f\"    - {span_dict['text']!r} [{span_dict['start_char']}:{span_dict['end_char']}]\")\n\nJSON result from execute():\n  spans: 4 items\n  metadata: {'processor': 'nltk_text', 'tokenizer': 'punkt', 'language': 'english', 'nltk_data_dir': None}\n    - 'Hello world.' [0:12]\n    - 'How are you?' [13:25]\n    - 'I am fine!' [26:36]\n    - 'This is a test.' [37:52]\n\n\n\n# Test with multi-paragraph text\nmulti_text = \"\"\"First paragraph. It has two sentences.\n\nSecond paragraph starts here. And continues here!\n\nThird paragraph: What about questions? They work too.\"\"\"\n\nresult = plugin.split_sentences(multi_text)\nprint(f\"Multi-paragraph text - {len(result.spans)} sentences found:\")\nfor i, span in enumerate(result.spans):\n    # Show first 50 chars of each span\n    preview = span.text[:50] + \"...\" if len(span.text) &gt; 50 else span.text\n    print(f\"  {i}: [{span.start_char:3d}:{span.end_char:3d}] {preview!r}\")\n\nMulti-paragraph text - 6 sentences found:\n  0: [  0: 16] 'First paragraph.'\n  1: [ 17: 38] 'It has two sentences.'\n  2: [ 40: 69] 'Second paragraph starts here.'\n  3: [ 70: 89] 'And continues here!'\n  4: [ 91:129] 'Third paragraph: What about questions?'\n  5: [130:144] 'They work too.'\n\n\n\n# Cleanup\nplugin.cleanup()",
+    "crumbs": [
+      "NLTK Plugin"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "cjm-text-plugin-nltk",
+    "section": "",
+    "text": "pip install cjm_text_plugin_nltk",
+    "crumbs": [
+      "cjm-text-plugin-nltk"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "cjm-text-plugin-nltk",
+    "section": "",
+    "text": "pip install cjm_text_plugin_nltk",
+    "crumbs": [
+      "cjm-text-plugin-nltk"
+    ]
+  },
+  {
+    "objectID": "index.html#project-structure",
+    "href": "index.html#project-structure",
+    "title": "cjm-text-plugin-nltk",
+    "section": "Project Structure",
+    "text": "Project Structure\nnbs/\n├── meta.ipynb   # Metadata introspection for the NLTK text plugin used by cjm-ctl to generate the registration manifest.\n└── plugin.ipynb # Plugin implementation for NLTK-based text processing with character-level span tracking\nTotal: 2 notebooks",
+    "crumbs": [
+      "cjm-text-plugin-nltk"
+    ]
+  },
+  {
+    "objectID": "index.html#module-dependencies",
+    "href": "index.html#module-dependencies",
+    "title": "cjm-text-plugin-nltk",
+    "section": "Module Dependencies",
+    "text": "Module Dependencies\ngraph LR\n    meta[meta&lt;br/&gt;Metadata]\n    plugin[plugin&lt;br/&gt;NLTK Plugin]\n\n    plugin --&gt; meta\n1 cross-module dependencies detected",
+    "crumbs": [
+      "cjm-text-plugin-nltk"
+    ]
+  },
+  {
+    "objectID": "index.html#cli-reference",
+    "href": "index.html#cli-reference",
+    "title": "cjm-text-plugin-nltk",
+    "section": "CLI Reference",
+    "text": "CLI Reference\nNo CLI commands found in this project.",
+    "crumbs": [
+      "cjm-text-plugin-nltk"
+    ]
+  },
+  {
+    "objectID": "index.html#module-overview",
+    "href": "index.html#module-overview",
+    "title": "cjm-text-plugin-nltk",
+    "section": "Module Overview",
+    "text": "Module Overview\nDetailed documentation for each module in the project:\n\nMetadata (meta.ipynb)\n\nMetadata introspection for the NLTK text plugin used by cjm-ctl to generate the registration manifest.\n\n\nImport\nfrom cjm_text_plugin_nltk.meta import (\n    get_plugin_metadata\n)\n\n\nFunctions\ndef get_plugin_metadata() -&gt; Dict[str, Any]:  # Plugin metadata for manifest generation\n    \"\"\"Return metadata required to register this plugin with the PluginManager.\"\"\"\n    # Fallback base path (current behavior for backward compatibility)\n    base_path = os.path.dirname(os.path.dirname(sys.executable))\n    \n    # Use CJM config if available, else fallback to env-relative paths\n    cjm_data_dir = os.environ.get(\"CJM_DATA_DIR\")\n    \n    # Plugin data directory\n    plugin_name = \"cjm-text-plugin-nltk\"\n    if cjm_data_dir\n    \"Return metadata required to register this plugin with the PluginManager.\"\n\n\n\nNLTK Plugin (plugin.ipynb)\n\nPlugin implementation for NLTK-based text processing with character-level span tracking\n\n\nImport\nfrom cjm_text_plugin_nltk.plugin import (\n    NLTKPluginConfig,\n    NLTKPlugin\n)\n\n\nClasses\n@dataclass\nclass NLTKPluginConfig:\n    \"Configuration for NLTK text processing plugin.\"\n    \n    tokenizer: str = field(...)\n    language: str = field(...)\nclass NLTKPlugin:\n    def __init__(self):\n        \"\"\"Initialize the NLTK plugin.\"\"\"\n        self.logger = logging.getLogger(f\"{__name__}.{type(self).__name__}\")\n        self.config: NLTKPluginConfig = None\n    \"NLTK-based text processing plugin with character-level span tracking.\"\n    \n    def __init__(self):\n            \"\"\"Initialize the NLTK plugin.\"\"\"\n            self.logger = logging.getLogger(f\"{__name__}.{type(self).__name__}\")\n            self.config: NLTKPluginConfig = None\n        \"Initialize the NLTK plugin.\"\n    \n    def name(self) -&gt; str:  # Plugin name identifier\n            \"\"\"Get the plugin name identifier.\"\"\"\n            return \"nltk_text\"\n        \n        @property\n        def version(self) -&gt; str:  # Plugin version string\n        \"Get the plugin name identifier.\"\n    \n    def version(self) -&gt; str:  # Plugin version string\n            \"\"\"Get the plugin version string.\"\"\"\n            return \"1.0.0\"\n    \n        def get_current_config(self) -&gt; Dict[str, Any]:  # Current configuration as dictionary\n        \"Get the plugin version string.\"\n    \n    def get_current_config(self) -&gt; Dict[str, Any]:  # Current configuration as dictionary\n            \"\"\"Return current configuration state.\"\"\"\n            if not self.config\n        \"Return current configuration state.\"\n    \n    def get_config_schema(self) -&gt; Dict[str, Any]:  # JSON Schema for configuration\n            \"\"\"Return JSON Schema for UI generation.\"\"\"\n            return dataclass_to_jsonschema(NLTKPluginConfig)\n    \n        @staticmethod\n        def get_config_dataclass() -&gt; NLTKPluginConfig:  # Configuration dataclass\n        \"Return JSON Schema for UI generation.\"\n    \n    def get_config_dataclass() -&gt; NLTKPluginConfig:  # Configuration dataclass\n            \"\"\"Return dataclass describing the plugin's configuration options.\"\"\"\n            return NLTKPluginConfig\n        \n        def _ensure_nltk_data(self) -&gt; None\n        \"Return dataclass describing the plugin's configuration options.\"\n    \n    def initialize(\n            self,\n            config: Optional[Any] = None  # Configuration dataclass, dict, or None\n        ) -&gt; None\n        \"Initialize or re-configure the plugin (idempotent).\"\n    \n    def execute(\n            self,\n            action: str = \"split_sentences\",  # Operation: 'split_sentences'\n            **kwargs\n        ) -&gt; Dict[str, Any]:  # JSON-serializable result\n        \"Execute a text processing operation.\"\n    \n    def split_sentences(\n            self,\n            text: str,  # Input text to split into sentences\n            **kwargs\n        ) -&gt; TextProcessResult:  # Result with TextSpan objects containing character indices\n        \"Split text into sentence spans with accurate character positions.\"\n    \n    def cleanup(self) -&gt; None\n        \"Clean up resources.\"",
+    "crumbs": [
+      "cjm-text-plugin-nltk"
+    ]
+  },
+  {
+    "objectID": "meta.html",
+    "href": "meta.html",
+    "title": "Metadata",
+    "section": "",
+    "text": "source",
+    "crumbs": [
+      "Metadata"
+    ]
+  },
+  {
+    "objectID": "meta.html#testing",
+    "href": "meta.html#testing",
+    "title": "Metadata",
+    "section": "Testing",
+    "text": "Testing\n\nimport json\n\nmetadata = get_plugin_metadata()\nprint(json.dumps(metadata, indent=2))\n\n{\n  \"name\": \"cjm-text-plugin-nltk\",\n  \"version\": \"0.0.2\",\n  \"type\": \"text-processing\",\n  \"category\": \"text-processing\",\n  \"interface\": \"cjm_text_plugin_system.plugin_interface.TextProcessingPlugin\",\n  \"module\": \"cjm_text_plugin_nltk.plugin\",\n  \"class\": \"NLTKPlugin\",\n  \"python_path\": \"/opt/hostedtoolcache/Python/3.12.12/x64/bin/python\",\n  \"db_path\": \"/opt/hostedtoolcache/Python/3.12.12/x64/data/nltk_text_processing.db\",\n  \"resources\": {\n    \"requires_gpu\": false,\n    \"min_system_ram_mb\": 512\n  },\n  \"env_vars\": {\n    \"NLTK_DATA\": \"/opt/hostedtoolcache/Python/3.12.12/x64/data/nltk_data\"\n  }\n}",
+    "crumbs": [
+      "Metadata"
+    ]
+  }
+]
