@@ -1,11 +1,30 @@
 [build-system]
-requires = ["setuptools>=64.0,<76.0"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="cjm-text-plugin-nltk"
-requires-python=">=3.12"
-dynamic = [ "keywords", "description", "version", "dependencies", "optional-dependencies", "readme", "license", "authors", "classifiers", "entry-points", "scripts", "urls"]
+name = "cjm-text-plugin-nltk"
+dynamic = ["version"]
+description = "A local, NLTK-based text processing worker for the cjm-plugin-system that provides sentence splitting and tokenization with character-level span tracking."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Apache-2.0"}
+authors = [{name = "Christian J. Mills", email = "9126128+cj-mills@users.noreply.github.com"}]
+keywords = ['nbdev', 'jupyter', 'notebook', 'python']
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+dependencies = ['cjm_text_plugin_system', 'nltk']
 
-[tool.uv]
-cache-keys = [{ file = "pyproject.toml" }, { file = "settings.ini" }, { file = "setup.py" }]
+[project.urls]
+Repository = "https://github.com/cj-mills/cjm-text-plugin-nltk"
+Documentation = "https://cj-mills.github.io/cjm-text-plugin-nltk"
+
+[project.entry-points.nbdev]
+cjm_text_plugin_nltk = "cjm_text_plugin_nltk._modidx:d"
+
+[tool.setuptools.dynamic]
+version = {attr = "cjm_text_plugin_nltk.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["cjm_text_plugin_nltk"]
+
+[tool.nbdev]
